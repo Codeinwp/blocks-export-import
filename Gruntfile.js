@@ -18,7 +18,13 @@ module.exports = function (grunt) {
 					flags: ''
 				},
 				src: [ 'index.php' ]
-
+			},
+			metatag: {
+				options: {
+					prefix: 'Version:\\s*',
+					flags: ''
+				},
+				src: [ 'index.php' ]
 			}
 		},
 		wp_readme_to_markdown: {

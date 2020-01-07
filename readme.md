@@ -29,9 +29,15 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 
 ## Changelog ##
 
-####   Version1.0.0 (2020-01-07)
+##### [Version 1.0.1](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.0...v1.0.1) (2020-01-07)
 
-> Things are getting better every day. :rocket:
-Update dependencies
+update dependencies
+
+
+
+
+####  Version 1.0.0 (2020-01-07)
+
+* Update dependencies
 
 

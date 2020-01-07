@@ -31,12 +31,10 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 
 ##### [Version 1.0.1](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.0...v1.0.1) (2020-01-07)
 
-update dependencies
+* Update dependencies
 
 
-
-
-####  Version 1.0.0 (2020-01-07)
+####  Version 1.0.0
 
 * Update dependencies
 

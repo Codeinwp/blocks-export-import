@@ -28,3 +28,10 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 
 
 == Changelog ==
+
+####   Version1.0.0 (2020-01-07)
+
+> Things are getting better every day. :rocket:
+Update dependencies
+
+

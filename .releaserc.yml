@@ -21,6 +21,7 @@ plugins:
         - package-lock.json
         - readme.txt
         - readme.md
+        - index.php
         - package.json
   - - "@semantic-release/github"
 

@@ -17,6 +17,8 @@
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain:       blocks-export-import
  * Domain Path:       /languages
+ * WordPress Available:  yes
+ * Requires License:    no
  */
 
 define( 'BLOCKS_EXPORT_IMPORT_VERSION', '1.0.0' );
@@ -34,5 +36,14 @@ add_action(
 				} 
 			);
 		}
+	}
+);
+
+add_filter(
+	'themeisle_sdk_products',
+	function ( $products ) {
+		$products[] = __FILE__;
+
+		return $products;
 	}
 );

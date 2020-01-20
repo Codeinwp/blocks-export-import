@@ -1,8 +1,8 @@
 # Blocks Export Import #
 **Contributors:** [themeisle](https://profiles.wordpress.org/themeisle), [hardeepasrani](https://profiles.wordpress.org/hardeepasrani)  
-**Tags:** gutenberg, block, blocks, export, import, exporter, importer, block exporter, block export, block import, block importer
+**Tags:** gutenberg, block, blocks, export, import, exporter, importer, block exporter, block export, block import, block importer  
 **Requires at least:** 4.9      
-**Tested up to:** 5.0    
+**Tested up to:** 5.3  
 **Requires PHP:** 5.4    
 **Stable tag:** trunk  
 **License:** GPLv3    
@@ -24,4 +24,20 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 ## Screenshots ##
 
 1. Export Blocks.
-2. Import Blocks.
+2. Import Blocks
+
+
+## Changelog ##
+
+##### [Version 1.0.1](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.0...v1.0.1) (2020-01-07)
+
+update dependencies
+
+
+
+
+####  Version 1.0.0 (2020-01-07)
+
+* Update dependencies
+
+

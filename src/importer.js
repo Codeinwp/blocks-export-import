@@ -73,7 +73,7 @@ const Impoter = compose([
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML }) => ({
 		import: ( content ) => dispatch( 'core/editor' ).replaceBlocks(
 			block.clientId,
-			content,
+			content
 		)
 	}) )
 ])( BlocksImporter );

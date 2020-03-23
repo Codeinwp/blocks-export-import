@@ -23,7 +23,7 @@
 		"replace-in-file": "^5.0.2",
 		"semantic-release": "^17.0.4",
 		"@babel/core": "^7.8.7",
-		"@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+		"@babel/plugin-proposal-object-rest-spread": "^7.9.0",
 		"@babel/plugin-transform-async-to-generator": "^7.8.3",
 		"@babel/plugin-transform-react-jsx": "^7.8.3",
 		"@babel/preset-env": "^7.8.7",

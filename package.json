@@ -27,7 +27,7 @@
 		"@babel/plugin-transform-async-to-generator": "^7.8.3",
 		"@babel/plugin-transform-react-jsx": "^7.8.3",
 		"@babel/preset-env": "^7.9.0",
-		"babel-loader": "^8.0.4",
+		"babel-loader": "^8.1.0",
 		"cross-env": "7.0.2",
 		"eslint": "^6.8.0",
 		"eslint-config-wordpress": "^2.0.0",

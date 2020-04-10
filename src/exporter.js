@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies.
  */
-
 const { __ } = wp.i18n;
 
 const { registerPlugin } = wp.plugins;
@@ -74,7 +73,7 @@ class BlocksExporter extends Component {
 
 const Exporter = compose([
 	withSelect( ( select ) => {
-		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/editor' );
+		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' ) || select( 'core/editor' );
 
 		return {
 			count: getSelectedBlockCount(),

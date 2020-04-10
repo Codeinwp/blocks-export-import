@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies.
  */
-
 const { __ } = wp.i18n;
 
 const { registerBlockType } = wp.blocks;
@@ -62,8 +61,10 @@ class BlocksImporter extends Component {
 
 const Impoter = compose([
 	withSelect( ( select, { clientId }) => {
-		const { getBlock, canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { getBlock } = select( 'core/block-editor' ) || select( 'core/editor' );
 		const block = getBlock( clientId );
+
 		return {
 			block,
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML()

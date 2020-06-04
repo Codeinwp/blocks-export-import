@@ -3,63 +3,64 @@
  */
 const { __ } = wp.i18n;
 
-const { registerBlockType } = wp.blocks;
-
-const {
-	Button,
-	Placeholder
-} = wp.components;
+const { Placeholder } = wp.components;
 
 const { compose } = wp.compose;
+
+const {
+	DropZone,
+	DropZoneProvider,
+	FormFileUpload
+} = wp.components;
 
 const {
 	withDispatch,
 	withSelect
 } = wp.data;
 
-const { Component } = wp.element;
+const { useEffect } = wp.element;
 
-class BlocksImporter extends Component {
-	constructor() {
-		super( ...arguments );
+const BlocksImporter = ({
+	attributes,
+	importBlock
+}) => {
+	useEffect( () => uploadImport( attributes.file ), []);
 
-		this.uploadInput = React.createRef();
-		this.uploadImport = this.uploadImport.bind( this );
-	}
-
-	uploadImport( e ) {
-		const fileTobeRead = e.current.files[0];
+	const uploadImport = files => {
+		const fileTobeRead = files[0];
+		if ( 'application/json' !== fileTobeRead.type ) {
+			return;
+		}
 		const fileReader = new FileReader();
-		fileReader.onload = () => {
-			this.props.import( JSON.parse( fileReader.result ) );
-		};
+		fileReader.onload = () => importBlock( JSON.parse( fileReader.result ) );
 		fileReader.readAsText( fileTobeRead );
-	}
+	};
 
-	render() {
-		return (
-			<Placeholder
-				label={ 'Import Blocks from JSON' }
-				icon="share-alt2"
-			>
-				<input
-					type="file"
+	return (
+		<Placeholder
+			label={ 'Import Blocks from JSON' }
+			instructions={ 'Upload JSON file from your device.' }
+			icon="category"
+		>
+			<DropZoneProvider>
+				<FormFileUpload
 					accept="text/json"
-					ref={ this.uploadInput }
-				/>
-
-				<Button
-					isPrimary
-					onClick={ () => this.uploadImport( this.uploadInput ) }
+					onChange={ e => uploadImport( e.target.files ) }
+					isSecondary
 				>
 					{ __( 'Upload' ) }
-				</Button>
-			</Placeholder>
-		);
-	}
-}
+				</FormFileUpload>
 
-const Impoter = compose([
+				<DropZone
+					label={ __( 'Import from JSON' ) }
+					onFilesDrop={ uploadImport }
+				/>
+			</DropZoneProvider>
+		</Placeholder>
+	);
+};
+
+export default compose([
 	withSelect( ( select, { clientId }) => {
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 		const { getBlock } = select( 'core/block-editor' ) || select( 'core/editor' );
@@ -72,28 +73,9 @@ const Impoter = compose([
 	}),
 
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML }) => ({
-		import: ( content ) => dispatch( 'core/editor' ).replaceBlocks(
+		importBlock: ( content ) => dispatch( 'core/block-editor' ).replaceBlocks(
 			block.clientId,
 			content
 		)
 	}) )
 ])( BlocksImporter );
-
-registerBlockType( 'blocks-export-import/importer', {
-	title: __( 'Import Blocks from JSON' ),
-	description: __( 'Allows you import blocks from a JSON file.' ),
-	icon: 'share-alt2',
-	category: 'widgets',
-	keywords: [
-		__( 'JSON' ),
-		__( 'Importer' ),
-		__( 'Import' )
-	],
-
-	edit: Impoter,
-
-	save: () => {
-		return null;
-	}
-});
-

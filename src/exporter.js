@@ -3,9 +3,7 @@
  */
 const { __ } = wp.i18n;
 
-const { registerPlugin } = wp.plugins;
-
-const { serialize, parse } = wp.blocks;
+const { serialize } = wp.blocks;
 
 const { compose } = wp.compose;
 
@@ -13,76 +11,46 @@ const { withSelect } = wp.data;
 
 const { PluginBlockSettingsMenuItem } = wp.editPost;
 
-const { Component } = wp.element;
-
-class BlocksExporter extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.parseBlocks = this.parseBlocks.bind( this );
-		this.exportBlocks = this.exportBlocks.bind( this );
-		this.saveJSON = this.saveJSON.bind( this );
-	}
-
-	parseBlocks( block ) {
-		return parse( serialize( block ) );
-	}
-
-	exportBlocks() {
-		this.saveJSON( this.parseBlocks( 1 === this.props.count ? this.props.block : this.props.blocks ), 1 === this.props.count ? 'block.json' : 'blocks.json' );
-	}
-
-	saveJSON( data, filename ) {
-		if ( ! data ) {
+const BlocksExporter = ({ blocks }) => {
+	const exportBlocks = () => {
+		if ( ! blocks ) {
 			return;
 		}
 
-		if ( ! filename ) {
-			filename = 'block.json';
-		}
+		let data = serialize( blocks );
 
-		if ( 'object' === typeof data ) {
-			if ( 1 === this.props.count ) {
-				data = JSON.stringify( data.shift(), undefined, 4 );
-			} else {
-				data = JSON.stringify( data, undefined, 4 );
-			}
-		}
+		data = JSON.stringify({
+			type: 'blocks_export',
+			version: 2,
+			content: data
+		}, null, 2 );
 
 		const blob = new Blob([ data ], { type: 'text/json' }),
 			e = document.createEvent( 'MouseEvents' ),
 			a = document.createElement( 'a' );
 
-		a.download = filename;
+		a.download = 'blocks-export.json';
 		a.href = window.URL.createObjectURL( blob );
 		a.dataset.downloadurl =  [ 'text/json', a.download, a.href ].join( ':' );
 		e.initMouseEvent( 'click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
 		a.dispatchEvent( e );
-	}
+	};
 
-	render() {
-		return (
-			<PluginBlockSettingsMenuItem
-				icon='share-alt2'
-				label={ __( 'Export as JSON' ) }
-				onClick={ this.exportBlocks }
-			/>
-		);
-	}
-}
+	return (
+		<PluginBlockSettingsMenuItem
+			icon="share-alt2"
+			label={ __( 'Export as JSON' ) }
+			onClick={ exportBlocks }
+		/>
+	);
+};
 
-const Exporter = compose([
+export default compose([
 	withSelect( ( select ) => {
-		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' ) || select( 'core/editor' );
+		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' );
 
 		return {
-			count: getSelectedBlockCount(),
-			block: getSelectedBlock(),
-			blocks: getMultiSelectedBlocks()
+			blocks: 1 === getSelectedBlockCount() ? getSelectedBlock() : getMultiSelectedBlocks()
 		};
 	})
 ])( BlocksExporter );
-
-registerPlugin( 'blocks-export-import', {
-	render: Exporter
-});

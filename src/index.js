@@ -8,10 +8,12 @@ const {
 	registerBlockType
 } = wp.blocks;
 
+const { registerPlugin } = wp.plugins;
+
 /**
  * Internal dependencies.
  */
-import './exporter.js';
+import Exporter from './exporter.js';
 import edit from './importer.js';
 
 registerBlockType( 'blocks-export-import/importer', {
@@ -40,4 +42,8 @@ registerBlockType( 'blocks-export-import/importer', {
 	},
 	edit,
 	save: () => null
+});
+
+registerPlugin( 'blocks-export-import', {
+	render: Exporter
 });

@@ -30,7 +30,6 @@ const BlocksExporter = ({
 			const a = document.createElement( 'a' );
 			a.href = URL.createObjectURL( file );
 			a.download = fileName;
-
 			a.style.display = 'none';
 			document.body.appendChild( a );
 			a.click();

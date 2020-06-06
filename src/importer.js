@@ -3,9 +3,14 @@
  */
 const { __ } = wp.i18n;
 
+const apiFetch = wp.apiFetch;
+
 const { parse } = wp.blocks;
 
-const { Placeholder } = wp.components;
+const {
+	Placeholder,
+	Spinner
+} = wp.components;
 
 const { compose } = wp.compose;
 
@@ -20,7 +25,10 @@ const {
 	withSelect
 } = wp.data;
 
-const { useEffect } = wp.element;
+const {
+	useEffect,
+	useState
+} = wp.element;
 
 const BlocksImporter = ({
 	attributes,
@@ -32,7 +40,10 @@ const BlocksImporter = ({
 		}
 	}, []);
 
+	const [ isLoading, setLoading ] = useState( false );
+
 	const uploadImport = files => {
+		setLoading( true );
 		const fileTobeRead = files[0];
 
 		if ( 'application/json' !== fileTobeRead.type ) {
@@ -41,16 +52,44 @@ const BlocksImporter = ({
 
 		const fileReader = new FileReader();
 
-		fileReader.onload = () => {
+		fileReader.onload = async() => {
 			let data = JSON.parse( fileReader.result );
+
 			if ( data.__file && 'wp_export' === data.__file ) {
 				data = parse( data.content );
 			}
+
+			if ( data.__file && 'wp_block' === data.__file ) {
+				const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
+
+				const reusableBlock = await apiFetch({
+					path: `/wp/v2/${ postType.rest_base }`,
+					data: {
+						title: data.title,
+						content: data.content,
+						status: 'publish'
+					},
+					method: 'POST'
+				});
+
+				data = `<!-- wp:block { "ref": ${ reusableBlock.id } } /-->`;
+				data = parse( data );
+			}
+
 			importBlock( data );
+			setLoading( false );
 		};
 
 		fileReader.readAsText( fileTobeRead );
 	};
+
+	if ( isLoading ) {
+		return (
+			<Placeholder>
+				<Spinner/>
+			</Placeholder>
+		);
+	}
 
 	return (
 		<Placeholder

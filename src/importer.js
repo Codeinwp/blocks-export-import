@@ -17,7 +17,8 @@ const { compose } = wp.compose;
 const {
 	DropZone,
 	DropZoneProvider,
-	FormFileUpload
+	FormFileUpload,
+	withNotices
 } = wp.components;
 
 const {
@@ -32,7 +33,9 @@ const {
 
 const BlocksImporter = ({
 	attributes,
-	importBlock
+	importBlock,
+	noticeOperations,
+	noticeUI
 }) => {
 	useEffect( () => {
 		if ( attributes.file ) {
@@ -47,30 +50,53 @@ const BlocksImporter = ({
 		const fileTobeRead = files[0];
 
 		if ( 'application/json' !== fileTobeRead.type ) {
+			const error = [
+				<strong key="filename">{ fileTobeRead.name }</strong>,
+				': ',
+				__( 'Sorry, only JSON files are supported here.' )
+			];
+			noticeOperations.removeAllNotices();
+			noticeOperations.createErrorNotice( error );
+			setLoading( false );
 			return;
 		}
 
 		const fileReader = new FileReader();
 
 		fileReader.onload = async() => {
-			let data = JSON.parse( fileReader.result );
+			let data;
+			try {
+				data = JSON.parse( fileReader.result );
+			} catch ( error ) {
+				noticeOperations.removeAllNotices();
+				noticeOperations.createErrorNotice( __( 'Invalid JSON file' ) );
+				setLoading( false );
+				return;
+			}
 
-			if ( data.__file && 'wp_export' === data.__file ) {
+			if ( data.__file && data.content && 'wp_export' === data.__file ) {
 				data = parse( data.content );
 			}
 
-			if ( data.__file && 'wp_block' === data.__file ) {
+			if ( data.__file && data.content && 'wp_block' === data.__file ) {
 				const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
 
 				const reusableBlock = await apiFetch({
 					path: `/wp/v2/${ postType.rest_base }`,
 					data: {
-						title: data.title,
+						title: data.title || __( 'Untitled Reusable Block' ),
 						content: data.content,
 						status: 'publish'
 					},
 					method: 'POST'
 				});
+
+				if ( ! reusableBlock.id ) {
+					noticeOperations.removeAllNotices();
+					noticeOperations.createErrorNotice( __( 'Invalid Reusable Block JSON file' ) );
+					setLoading( false );
+					return;
+				}
 
 				data = `<!-- wp:block { "ref": ${ reusableBlock.id } } /-->`;
 				data = parse( data );
@@ -96,6 +122,7 @@ const BlocksImporter = ({
 			label={ 'Import Blocks from JSON' }
 			instructions={ 'Upload JSON file from your device.' }
 			icon="category"
+			notices={ noticeUI }
 		>
 			<DropZoneProvider>
 				<FormFileUpload
@@ -132,5 +159,6 @@ export default compose([
 			block.clientId,
 			content
 		)
-	}) )
+	}) ),
+	withNotices
 ])( BlocksImporter );

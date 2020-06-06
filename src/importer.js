@@ -3,6 +3,8 @@
  */
 const { __ } = wp.i18n;
 
+const { parse } = wp.blocks;
+
 const { Placeholder } = wp.components;
 
 const { compose } = wp.compose;
@@ -24,15 +26,29 @@ const BlocksImporter = ({
 	attributes,
 	importBlock
 }) => {
-	useEffect( () => uploadImport( attributes.file ), []);
+	useEffect( () => {
+		if ( attributes.file ) {
+			uploadImport( attributes.file );
+		}
+	}, []);
 
 	const uploadImport = files => {
 		const fileTobeRead = files[0];
+
 		if ( 'application/json' !== fileTobeRead.type ) {
 			return;
 		}
+
 		const fileReader = new FileReader();
-		fileReader.onload = () => importBlock( JSON.parse( fileReader.result ) );
+
+		fileReader.onload = () => {
+			let data = JSON.parse( fileReader.result );
+			if ( data.__file && 'wp_export' === data.__file ) {
+				data = parse( data.content );
+			}
+			importBlock( data );
+		};
+
 		fileReader.readAsText( fileTobeRead );
 	};
 

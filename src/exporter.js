@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies.
  */
+const { kebabCase } = lodash;
+
 const { __ } = wp.i18n;
+
+const apiFetch = wp.apiFetch;
 
 const { serialize } = wp.blocks;
 
@@ -11,29 +15,67 @@ const { withSelect } = wp.data;
 
 const { PluginBlockSettingsMenuItem } = wp.editPost;
 
-const BlocksExporter = ({ blocks }) => {
-	const exportBlocks = () => {
+const BlocksExporter = ({
+	blocks,
+	count
+}) => {
+	const download = ( fileName, content, contentType ) => {
+		const file = new window.Blob([ content ], { type: contentType });
+
+		// IE11 can't use the click to download technique
+		// we use a specific IE11 technique instead.
+		if ( window.navigator.msSaveOrOpenBlob ) {
+			window.navigator.msSaveOrOpenBlob( file, fileName );
+		} else {
+			const a = document.createElement( 'a' );
+			a.href = URL.createObjectURL( file );
+			a.download = fileName;
+
+			a.style.display = 'none';
+			document.body.appendChild( a );
+			a.click();
+			document.body.removeChild( a );
+		}
+	};
+
+	const exportBlocks = async() => {
 		if ( ! blocks ) {
 			return;
 		}
 
-		let data = serialize( blocks );
+		let data, fileName;
 
-		data = JSON.stringify({
-			type: 'blocks_export',
-			version: 2,
-			content: data
-		}, null, 2 );
+		if ( 1 === count && 'core/block' === blocks.name ) {
+			const id = blocks.attributes.ref;
 
-		const blob = new Blob([ data ], { type: 'text/json' }),
-			e = document.createEvent( 'MouseEvents' ),
-			a = document.createElement( 'a' );
+			const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
 
-		a.download = 'blocks-export.json';
-		a.href = window.URL.createObjectURL( blob );
-		a.dataset.downloadurl =  [ 'text/json', a.download, a.href ].join( ':' );
-		e.initMouseEvent( 'click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
-		a.dispatchEvent( e );
+			const post = await apiFetch({
+				path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`
+			});
+
+			const title = post.title.raw;
+			const content = post.content.raw;
+			fileName = kebabCase( title ) + '.json';
+
+			data = {
+				__file: 'wp_block',
+				title,
+				content
+			};
+		} else {
+			fileName = 'blocks-export.json';
+
+			data = {
+				__file: 'wp_export',
+				version: 2,
+				content: serialize( blocks )
+			};
+		}
+
+		const fileContent = JSON.stringify({ ...data }, null, 2 );
+
+		download( fileName, fileContent, 'application/json' );
 	};
 
 	return (
@@ -50,7 +92,8 @@ export default compose([
 		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' );
 
 		return {
-			blocks: 1 === getSelectedBlockCount() ? getSelectedBlock() : getMultiSelectedBlocks()
+			blocks: 1 === getSelectedBlockCount() ? getSelectedBlock() : getMultiSelectedBlocks(),
+			count: getSelectedBlockCount()
 		};
 	})
 ])( BlocksExporter );

@@ -118,7 +118,7 @@ const BlocksImporter = ({
 export default compose([
 	withSelect( ( select, { clientId }) => {
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const { getBlock } = select( 'core/block-editor' ) || select( 'core/editor' );
+		const { getBlock } = select( 'core/block-editor' );
 		const block = getBlock( clientId );
 
 		return {
@@ -128,7 +128,7 @@ export default compose([
 	}),
 
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML }) => ({
-		importBlock: ( content ) => dispatch( 'core/block-editor' ).replaceBlocks(
+		importBlock: content => dispatch( 'core/block-editor' ).replaceBlocks(
 			block.clientId,
 			content
 		)

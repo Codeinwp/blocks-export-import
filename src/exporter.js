@@ -11,13 +11,17 @@ const { serialize } = wp.blocks;
 
 const { compose } = wp.compose;
 
-const { withSelect } = wp.data;
+const {
+	withDispatch,
+	withSelect
+} = wp.data;
 
 const { PluginBlockSettingsMenuItem } = wp.editPost;
 
 const BlocksExporter = ({
 	blocks,
-	count
+	count,
+	createNotice
 }) => {
 	const download = ( fileName, content, contentType ) => {
 		const file = new window.Blob([ content ], { type: contentType });
@@ -46,12 +50,19 @@ const BlocksExporter = ({
 
 		if ( 1 === count && 'core/block' === blocks.name ) {
 			const id = blocks.attributes.ref;
-
 			const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
+			let post;
 
-			const post = await apiFetch({
-				path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`
-			});
+			try {
+				post = await apiFetch({ path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` });
+			} catch ( error ) {
+				if ( error.message ) {
+					createNotice( 'error', error.message, {
+						type: 'snackbar'
+					});
+				}
+				return;
+			}
 
 			const title = post.title.raw;
 			const content = post.content.raw;
@@ -74,6 +85,10 @@ const BlocksExporter = ({
 
 		const fileContent = JSON.stringify({ ...data }, null, 2 );
 
+		createNotice( 'success', __( 'Blocks exported.' ), {
+			type: 'snackbar'
+		});
+
 		download( fileName, fileContent, 'application/json' );
 	};
 
@@ -87,12 +102,19 @@ const BlocksExporter = ({
 };
 
 export default compose([
-	withSelect( ( select ) => {
+	withSelect( select => {
 		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' );
 
 		return {
 			blocks: 1 === getSelectedBlockCount() ? getSelectedBlock() : getMultiSelectedBlocks(),
 			count: getSelectedBlockCount()
+		};
+	}),
+	withDispatch( dispatch => {
+		const { createNotice } = dispatch( 'core/notices' );
+
+		return {
+			createNotice
 		};
 	})
 ])( BlocksExporter );

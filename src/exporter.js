@@ -1,88 +1,120 @@
 /**
  * WordPress dependencies.
  */
+const { kebabCase } = lodash;
+
 const { __ } = wp.i18n;
 
-const { registerPlugin } = wp.plugins;
+const apiFetch = wp.apiFetch;
 
-const { serialize, parse } = wp.blocks;
+const { serialize } = wp.blocks;
 
 const { compose } = wp.compose;
 
-const { withSelect } = wp.data;
+const {
+	withDispatch,
+	withSelect
+} = wp.data;
 
 const { PluginBlockSettingsMenuItem } = wp.editPost;
 
-const { Component } = wp.element;
+const BlocksExporter = ({
+	blocks,
+	count,
+	createNotice
+}) => {
+	const download = ( fileName, content, contentType ) => {
+		const file = new window.Blob([ content ], { type: contentType });
 
-class BlocksExporter extends Component {
-	constructor() {
-		super( ...arguments );
+		// IE11 can't use the click to download technique
+		// we use a specific IE11 technique instead.
+		if ( window.navigator.msSaveOrOpenBlob ) {
+			window.navigator.msSaveOrOpenBlob( file, fileName );
+		} else {
+			const a = document.createElement( 'a' );
+			a.href = URL.createObjectURL( file );
+			a.download = fileName;
+			a.style.display = 'none';
+			document.body.appendChild( a );
+			a.click();
+			document.body.removeChild( a );
+		}
+	};
 
-		this.parseBlocks = this.parseBlocks.bind( this );
-		this.exportBlocks = this.exportBlocks.bind( this );
-		this.saveJSON = this.saveJSON.bind( this );
-	}
-
-	parseBlocks( block ) {
-		return parse( serialize( block ) );
-	}
-
-	exportBlocks() {
-		this.saveJSON( this.parseBlocks( 1 === this.props.count ? this.props.block : this.props.blocks ), 1 === this.props.count ? 'block.json' : 'blocks.json' );
-	}
-
-	saveJSON( data, filename ) {
-		if ( ! data ) {
+	const exportBlocks = async() => {
+		if ( ! blocks ) {
 			return;
 		}
 
-		if ( ! filename ) {
-			filename = 'block.json';
-		}
+		let data, fileName;
 
-		if ( 'object' === typeof data ) {
-			if ( 1 === this.props.count ) {
-				data = JSON.stringify( data.shift(), undefined, 4 );
-			} else {
-				data = JSON.stringify( data, undefined, 4 );
+		if ( 1 === count && 'core/block' === blocks.name ) {
+			const id = blocks.attributes.ref;
+			const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
+			let post;
+
+			try {
+				post = await apiFetch({ path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` });
+			} catch ( error ) {
+				if ( error.message ) {
+					createNotice( 'error', error.message, {
+						type: 'snackbar'
+					});
+				}
+				return;
 			}
+
+			const title = post.title.raw;
+			const content = post.content.raw;
+			fileName = kebabCase( title ) + '.json';
+
+			data = {
+				__file: 'wp_block',
+				title,
+				content
+			};
+		} else {
+			fileName = 'blocks-export.json';
+
+			data = {
+				__file: 'wp_export',
+				version: 2,
+				content: serialize( blocks )
+			};
 		}
 
-		const blob = new Blob([ data ], { type: 'text/json' }),
-			e = document.createEvent( 'MouseEvents' ),
-			a = document.createElement( 'a' );
+		const fileContent = JSON.stringify({ ...data }, null, 2 );
 
-		a.download = filename;
-		a.href = window.URL.createObjectURL( blob );
-		a.dataset.downloadurl =  [ 'text/json', a.download, a.href ].join( ':' );
-		e.initMouseEvent( 'click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
-		a.dispatchEvent( e );
-	}
+		createNotice( 'success', __( 'Blocks exported.' ), {
+			type: 'snackbar'
+		});
 
-	render() {
-		return (
-			<PluginBlockSettingsMenuItem
-				icon='share-alt2'
-				label={ __( 'Export as JSON' ) }
-				onClick={ this.exportBlocks }
-			/>
-		);
-	}
-}
+		download( fileName, fileContent, 'application/json' );
+	};
 
-const Exporter = compose([
-	withSelect( ( select ) => {
-		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' ) || select( 'core/editor' );
+	return (
+		<PluginBlockSettingsMenuItem
+			icon="share-alt2"
+			label={ __( 'Export as JSON' ) }
+			onClick={ exportBlocks }
+		/>
+	);
+};
+
+export default compose([
+	withSelect( select => {
+		const { getSelectedBlockCount, getSelectedBlock, getMultiSelectedBlocks } = select( 'core/block-editor' );
 
 		return {
-			count: getSelectedBlockCount(),
-			block: getSelectedBlock(),
-			blocks: getMultiSelectedBlocks()
+			blocks: 1 === getSelectedBlockCount() ? getSelectedBlock() : getMultiSelectedBlocks(),
+			count: getSelectedBlockCount()
+		};
+	}),
+	withDispatch( dispatch => {
+		const { createNotice } = dispatch( 'core/notices' );
+
+		return {
+			createNotice
 		};
 	})
 ])( BlocksExporter );
-
-registerPlugin( 'blocks-export-import', {
-	render: Exporter
-});

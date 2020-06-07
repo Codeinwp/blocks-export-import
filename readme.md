@@ -29,6 +29,15 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 
 ## Changelog ##
 
+#### [Version 1.1.0](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.2...v1.1.0) (2020-06-07)
+
+- Changed export file format.
+- Added drag & drop import.
+- Added support for Reusable Blocks.
+
+
+
+
 ##### [Version 1.0.2](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.1...v1.0.2) (2020-04-10)
 
 - Makes compatible with the latest version of WordPress

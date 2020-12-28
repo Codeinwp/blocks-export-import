@@ -34,6 +34,6 @@
 		"replace-in-file": "^6.1.0",
 		"semantic-release": "^17.1.1",
 		"webpack": "^4.44.1",
-		"webpack-cli": "^3.3.12"
+		"webpack-cli": "^4.3.0"
 	}
 }

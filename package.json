@@ -3,37 +3,18 @@
 	"version": "1.1.0",
 	"description": "Export and Import Gutenberg Blocks",
 	"scripts": {
-		"build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
-		"dev": "cross-env BABEL_ENV=default NODE_ENV=development webpack --watch",
-		"lint": "eslint src/*.js",
-		"release": "npx semantic-release"
+		"build": "wp-scripts build",
+		"build:makepot": "wp i18n make-pot . ./languages/blocks-export-import.pot --allow-root",
+		"start": "wp-scripts start",
+		"lint:js": "wp-scripts lint-js",
+		"format": "wp-scripts format",
+		"packages-update": "wp-scripts packages-update"
 	},
 	"engines": {
 		"node": ">=8.0.0",
 		"npm": ">=6.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.11.6",
-		"@babel/plugin-proposal-object-rest-spread": "^7.10.4",
-		"@babel/plugin-transform-async-to-generator": "^7.10.4",
-		"@babel/plugin-transform-react-jsx": "^7.10.4",
-		"@babel/preset-env": "^7.10.4",
-		"@semantic-release/changelog": "^5.0.1",
-		"@semantic-release/exec": "^5.0.0",
-		"@semantic-release/git": "^9.0.0",
-		"babel-loader": "^8.1.0",
-		"conventional-changelog-simple-preset": "^1.0.14",
-		"cross-env": "7.0.2",
-		"eslint": "^7.8.1",
-		"eslint-config-wordpress": "^2.0.0",
-		"eslint-loader": "^4.0.2",
-		"eslint-plugin-react": "^7.20.6",
-		"grunt": "^1.3.0",
-		"grunt-version": "^2.0.0",
-		"grunt-wp-readme-to-markdown": "^2.0.1",
-		"replace-in-file": "^6.1.0",
-		"semantic-release": "^17.1.1",
-		"webpack": "^4.44.1",
-		"webpack-cli": "^3.3.12"
+		"@wordpress/scripts": "^16.1.2"
 	}
 }

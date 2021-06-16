@@ -1,8 +1,8 @@
 === Blocks Export Import ===
 Contributors: themeisle, hardeepasrani
 Tags: gutenberg, block, blocks, export, import, exporter, importer, block exporter, block export, block import, block importer
-Requires at least: 5.2    
-Tested up to: 5.6
+Requires at least: 5.3    
+Tested up to: 5.8
 Requires PHP: 5.4  
 Stable tag: trunk
 License: GPLv3  

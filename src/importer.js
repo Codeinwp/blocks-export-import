@@ -1,39 +1,23 @@
 /**
  * WordPress dependencies.
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const apiFetch = wp.apiFetch;
+import apiFetch from '@wordpress/api-fetch';
 
-const { parse } = wp.blocks;
+import { parse } from '@wordpress/blocks';
 
-const {
-	Placeholder,
-	Spinner
-} = wp.components;
+import { Placeholder, Spinner } from '@wordpress/components';
 
-const { compose } = wp.compose;
+import { DropZone, FormFileUpload, withNotices } from '@wordpress/components';
 
-const {
-	DropZone,
-	DropZoneProvider,
-	FormFileUpload,
-	withNotices
-} = wp.components;
+import { useDispatch } from '@wordpress/data';
 
-const {
-	withDispatch,
-	withSelect
-} = wp.data;
-
-const {
-	useEffect,
-	useState
-} = wp.element;
+import { useEffect, useState } from '@wordpress/element';
 
 const BlocksImporter = ({
+	clientId,
 	attributes,
-	importBlock,
 	noticeOperations,
 	noticeUI
 }) => {
@@ -45,15 +29,22 @@ const BlocksImporter = ({
 
 	const [ isLoading, setLoading ] = useState( false );
 
-	const uploadImport = files => {
+	const { replaceBlocks } = useDispatch( 'core/block-editor' );
+
+	const importBlock = ( content ) => replaceBlocks( clientId, content );
+
+	const uploadImport = ( files ) => {
 		setLoading( true );
-		const fileTobeRead = files[0];
+		const fileTobeRead = files[ 0 ];
 
 		if ( 'application/json' !== fileTobeRead.type ) {
 			const error = [
 				<strong key="filename">{ fileTobeRead.name }</strong>,
 				': ',
-				__( 'Sorry, only JSON files are supported here.' )
+				__(
+					'Sorry, only JSON files are supported here.',
+					'blocks-export-import'
+				)
 			];
 			noticeOperations.removeAllNotices();
 			noticeOperations.createErrorNotice( error );
@@ -69,7 +60,9 @@ const BlocksImporter = ({
 				data = JSON.parse( fileReader.result );
 			} catch ( error ) {
 				noticeOperations.removeAllNotices();
-				noticeOperations.createErrorNotice( __( 'Invalid JSON file' ) );
+				noticeOperations.createErrorNotice(
+					__( 'Invalid JSON file', 'blocks-export-import' )
+				);
 				setLoading( false );
 				return;
 			}
@@ -79,12 +72,19 @@ const BlocksImporter = ({
 			}
 
 			if ( data.__file && data.content && 'wp_block' === data.__file ) {
-				const postType = await apiFetch({ path: '/wp/v2/types/wp_block' });
+				const postType = await apiFetch({
+					path: '/wp/v2/types/wp_block'
+				});
 
 				const reusableBlock = await apiFetch({
 					path: `/wp/v2/${ postType.rest_base }`,
 					data: {
-						title: data.title || __( 'Untitled Reusable Block' ),
+						title:
+							data.title ||
+							__(
+								'Untitled Reusable Block',
+								'blocks-export-import'
+							),
 						content: data.content,
 						status: 'publish'
 					},
@@ -93,7 +93,12 @@ const BlocksImporter = ({
 
 				if ( ! reusableBlock.id ) {
 					noticeOperations.removeAllNotices();
-					noticeOperations.createErrorNotice( __( 'Invalid Reusable Block JSON file' ) );
+					noticeOperations.createErrorNotice(
+						__(
+							'Invalid Reusable Block JSON file',
+							'blocks-export-import'
+						)
+					);
 					setLoading( false );
 					return;
 				}
@@ -112,53 +117,35 @@ const BlocksImporter = ({
 	if ( isLoading ) {
 		return (
 			<Placeholder>
-				<Spinner/>
+				<Spinner />
 			</Placeholder>
 		);
 	}
 
 	return (
 		<Placeholder
-			label={ 'Import Blocks from JSON' }
-			instructions={ 'Upload JSON file from your device.' }
+			label={ __( 'Import Blocks from JSON', 'blocks-export-import' ) }
+			instructions={ __(
+				'Upload JSON file from your device.',
+				'blocks-export-import'
+			) }
 			icon="category"
 			notices={ noticeUI }
 		>
-			<DropZoneProvider>
-				<FormFileUpload
-					accept="text/json"
-					onChange={ e => uploadImport( e.target.files ) }
-					isSecondary
-				>
-					{ __( 'Upload' ) }
-				</FormFileUpload>
+			<FormFileUpload
+				accept="text/json"
+				onChange={ ( e ) => uploadImport( e.target.files ) }
+				isSecondary
+			>
+				{ __( 'Upload' ) }
+			</FormFileUpload>
 
-				<DropZone
-					label={ __( 'Import from JSON' ) }
-					onFilesDrop={ uploadImport }
-				/>
-			</DropZoneProvider>
+			<DropZone
+				label={ __( 'Import from JSON', 'blocks-export-import' ) }
+				onFilesDrop={ uploadImport }
+			/>
 		</Placeholder>
 	);
 };
 
-export default compose([
-	withSelect( ( select, { clientId }) => {
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const { getBlock } = select( 'core/block-editor' );
-		const block = getBlock( clientId );
-
-		return {
-			block,
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML()
-		};
-	}),
-
-	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML }) => ({
-		importBlock: content => dispatch( 'core/block-editor' ).replaceBlocks(
-			block.clientId,
-			content
-		)
-	}) ),
-	withNotices
-])( BlocksImporter );
+export default withNotices( BlocksImporter );

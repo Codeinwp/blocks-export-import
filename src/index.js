@@ -1,14 +1,11 @@
 /**
  * WordPress dependencies.
  */
-const { __ } = wp.i18n;
+import { __ } from '@wordpress/i18n';
 
-const {
-	createBlock,
-	registerBlockType
-} = wp.blocks;
+import { createBlock, registerBlockType } from '@wordpress/blocks';
 
-const { registerPlugin } = wp.plugins;
+import { registerPlugin } from '@wordpress/plugins';
 
 /**
  * Internal dependencies.
@@ -17,14 +14,17 @@ import Exporter from './exporter.js';
 import edit from './importer.js';
 
 registerBlockType( 'blocks-export-import/importer', {
-	title: __( 'Import Blocks from JSON' ),
-	description: __( 'Allows you import blocks from a JSON file.' ),
+	title: __( 'Import Blocks from JSON', 'blocks-export-import' ),
+	description: __(
+		'Allows you import blocks from a JSON file.',
+		'blocks-export-import'
+	),
 	icon: 'category',
 	category: 'widgets',
 	keywords: [
-		__( 'JSON' ),
-		__( 'Importer' ),
-		__( 'Import' )
+		__( 'JSON', 'blocks-export-import' ),
+		__( 'Importer', 'blocks-export-import' ),
+		__( 'Import', 'blocks-export-import' )
 	],
 	attributes: {
 		file: {
@@ -35,8 +35,9 @@ registerBlockType( 'blocks-export-import/importer', {
 		from: [
 			{
 				type: 'files',
-				isMatch: file => 'application/json' === file[ 0 ].type,
-				transform: file => createBlock( 'blocks-export-import/importer', { file })
+				isMatch: ( file ) => 'application/json' === file[ 0 ].type,
+				transform: ( file ) =>
+					createBlock( 'blocks-export-import/importer', { file })
 			}
 		]
 	},

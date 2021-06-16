@@ -18,22 +18,22 @@ const BlocksExporter = () => {
 		const {
 			getSelectedBlockCount,
 			getSelectedBlock,
-			getMultiSelectedBlocks,
+			getMultiSelectedBlocks
 		} = select( 'core/block-editor' );
 
 		return {
 			blocks:
-				1 === getSelectedBlockCount()
-					? getSelectedBlock()
-					: getMultiSelectedBlocks(),
-			count: getSelectedBlockCount(),
+				1 === getSelectedBlockCount() ?
+					getSelectedBlock() :
+					getMultiSelectedBlocks(),
+			count: getSelectedBlockCount()
 		};
-	} );
+	});
 
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const download = ( fileName, content, contentType ) => {
-		const file = new window.Blob( [ content ], { type: contentType } );
+		const file = new window.Blob([ content ], { type: contentType });
 
 		// IE11 can't use the click to download technique
 		// we use a specific IE11 technique instead.
@@ -50,7 +50,7 @@ const BlocksExporter = () => {
 		}
 	};
 
-	const exportBlocks = async () => {
+	const exportBlocks = async() => {
 		if ( ! blocks ) {
 			return;
 		}
@@ -59,20 +59,20 @@ const BlocksExporter = () => {
 
 		if ( 1 === count && 'core/block' === blocks.name ) {
 			const id = blocks.attributes.ref;
-			const postType = await apiFetch( {
-				path: '/wp/v2/types/wp_block',
-			} );
+			const postType = await apiFetch({
+				path: '/wp/v2/types/wp_block'
+			});
 			let post;
 
 			try {
-				post = await apiFetch( {
-					path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`,
-				} );
+				post = await apiFetch({
+					path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit`
+				});
 			} catch ( error ) {
 				if ( error.message ) {
 					createNotice( 'error', error.message, {
-						type: 'snackbar',
-					} );
+						type: 'snackbar'
+					});
 				}
 				return;
 			}
@@ -84,7 +84,7 @@ const BlocksExporter = () => {
 			data = {
 				__file: 'wp_block',
 				title,
-				content,
+				content
 			};
 		} else {
 			fileName = 'blocks-export.json';
@@ -92,17 +92,17 @@ const BlocksExporter = () => {
 			data = {
 				__file: 'wp_export',
 				version: 2,
-				content: serialize( blocks ),
+				content: serialize( blocks )
 			};
 		}
 
-		const fileContent = JSON.stringify( { ...data }, null, 2 );
+		const fileContent = JSON.stringify({ ...data }, null, 2 );
 
 		createNotice(
 			'success',
 			__( 'Blocks exported.', 'blocks-export-import' ),
 			{
-				type: 'snackbar',
+				type: 'snackbar'
 			}
 		);
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* jshint node:true */
 /* global require */
 

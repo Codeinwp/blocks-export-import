@@ -15,17 +15,17 @@ import { useDispatch } from '@wordpress/data';
 
 import { useEffect, useState } from '@wordpress/element';
 
-const BlocksImporter = ( {
+const BlocksImporter = ({
 	clientId,
 	attributes,
 	noticeOperations,
-	noticeUI,
-} ) => {
+	noticeUI
+}) => {
 	useEffect( () => {
 		if ( attributes.file ) {
 			uploadImport( attributes.file );
 		}
-	}, [] );
+	}, []);
 
 	const [ isLoading, setLoading ] = useState( false );
 
@@ -44,7 +44,7 @@ const BlocksImporter = ( {
 				__(
 					'Sorry, only JSON files are supported here.',
 					'blocks-export-import'
-				),
+				)
 			];
 			noticeOperations.removeAllNotices();
 			noticeOperations.createErrorNotice( error );
@@ -54,7 +54,7 @@ const BlocksImporter = ( {
 
 		const fileReader = new FileReader();
 
-		fileReader.onload = async () => {
+		fileReader.onload = async() => {
 			let data;
 			try {
 				data = JSON.parse( fileReader.result );
@@ -72,11 +72,11 @@ const BlocksImporter = ( {
 			}
 
 			if ( data.__file && data.content && 'wp_block' === data.__file ) {
-				const postType = await apiFetch( {
-					path: '/wp/v2/types/wp_block',
-				} );
+				const postType = await apiFetch({
+					path: '/wp/v2/types/wp_block'
+				});
 
-				const reusableBlock = await apiFetch( {
+				const reusableBlock = await apiFetch({
 					path: `/wp/v2/${ postType.rest_base }`,
 					data: {
 						title:
@@ -86,10 +86,10 @@ const BlocksImporter = ( {
 								'blocks-export-import'
 							),
 						content: data.content,
-						status: 'publish',
+						status: 'publish'
 					},
-					method: 'POST',
-				} );
+					method: 'POST'
+				});
 
 				if ( ! reusableBlock.id ) {
 					noticeOperations.removeAllNotices();

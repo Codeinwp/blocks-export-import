@@ -24,12 +24,12 @@ registerBlockType( 'blocks-export-import/importer', {
 	keywords: [
 		__( 'JSON', 'blocks-export-import' ),
 		__( 'Importer', 'blocks-export-import' ),
-		__( 'Import', 'blocks-export-import' ),
+		__( 'Import', 'blocks-export-import' )
 	],
 	attributes: {
 		file: {
-			type: 'object',
-		},
+			type: 'object'
+		}
 	},
 	transforms: {
 		from: [
@@ -37,14 +37,14 @@ registerBlockType( 'blocks-export-import/importer', {
 				type: 'files',
 				isMatch: ( file ) => 'application/json' === file[ 0 ].type,
 				transform: ( file ) =>
-					createBlock( 'blocks-export-import/importer', { file } ),
-			},
-		],
+					createBlock( 'blocks-export-import/importer', { file })
+			}
+		]
 	},
 	edit,
-	save: () => null,
-} );
+	save: () => null
+});
 
 registerPlugin( 'blocks-export-import', {
-	render: Exporter,
-} );
+	render: Exporter
+});

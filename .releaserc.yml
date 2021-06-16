@@ -20,7 +20,8 @@ plugins:
             - package-lock.json
             - package-lock.json
             - readme.txt
-            - readme.md
             - index.php
+            - readme.md
             - package.json
+        message: "chore(release): ${nextRelease.version} \n\n${nextRelease.notes}"
     - - '@semantic-release/github'

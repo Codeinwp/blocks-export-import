@@ -46,7 +46,7 @@ function blocks_export_import_enqueue() {
 		true
 	);
 
-	wp_set_script_translations( 'blocks-export-import', 'blocks-export-import', plugin_dir_path( __FILE__ ) . 'languages' );
+	wp_set_script_translations( 'blocks-export-import', 'blocks-export-import' );
 }
 
 add_action( 'enqueue_block_editor_assets', 'blocks_export_import_enqueue' );

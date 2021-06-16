@@ -6,7 +6,7 @@
 		"build": "wp-scripts build",
 		"build:makepot": "wp i18n make-pot . ./languages/blocks-export-import.pot --allow-root",
 		"start": "wp-scripts start",
-		"lint:js": "wp-scripts lint-js",
+		"lint": "wp-scripts lint-js",
 		"format": "wp-scripts format",
 		"packages-update": "wp-scripts packages-update"
 	},

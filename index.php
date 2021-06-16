@@ -25,7 +25,7 @@ define( 'BLOCKS_EXPORT_IMPORT_VERSION', '1.1.0' );
 
 /**
  * Load all translations for our plugin from the MO file.
-*/
+ */
 function blocks_export_import_load_textdomain() {
 	load_plugin_textdomain( 'blocks-export-import', false, plugin_dir_path( __FILE__ ) . 'languages' );
 }
@@ -36,13 +36,14 @@ add_action( 'init', 'blocks_export_import_load_textdomain' );
  * Registers all block assets.
  */
 function blocks_export_import_enqueue() {
-	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php');
+	$asset_file = include plugin_dir_path( __FILE__ ) . 'build/index.asset.php';
 
 	wp_enqueue_script(
 		'blocks-export-import',
 		plugins_url( 'build/index.js', __FILE__ ),
 		$asset_file['dependencies'],
-		$asset_file['version']
+		$asset_file['version'],
+		true
 	);
 
 	wp_set_script_translations( 'blocks-export-import', 'blocks-export-import', plugin_dir_path( __FILE__ ) . 'languages' );

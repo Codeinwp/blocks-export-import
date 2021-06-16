@@ -8,7 +8,8 @@
 		"start": "wp-scripts start",
 		"lint": "wp-scripts lint-js ./src --fix",
 		"format": "wp-scripts format ./src",
-		"packages-update": "wp-scripts packages-update"
+		"packages-update": "wp-scripts packages-update",
+		"release": "npx semantic-release"
 	},
 	"engines": {
 		"node": ">=8.0.0",

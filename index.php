@@ -10,7 +10,7 @@
  * Plugin Name:       Blocks Export Import
  * Plugin URI:        https://github.com/Codeinwp/blocks-export-import
  * Description:       Blocks Export Import allows to Export and Import blocks as JSON in Gutenberg Block Editor.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            ThemeIsle
  * Author URI:        https://themeisle.com
  * License:           GPL-3.0+
@@ -21,7 +21,7 @@
  * Requires License:    no
  */
 
-define( 'BLOCKS_EXPORT_IMPORT_VERSION', '1.1.0' );
+define( 'BLOCKS_EXPORT_IMPORT_VERSION', '1.1.1' );
 
 /**
  * Load all translations for our plugin from the MO file.

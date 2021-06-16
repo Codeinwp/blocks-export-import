@@ -29,6 +29,13 @@ Activating this plugin is just like any other plugin. If you’ve uploaded the p
 
 ## Changelog ##
 
+##### [Version 1.1.1](https://github.com/Codeinwp/blocks-export-import/compare/v1.1.0...v1.1.1) (2021-06-16)
+
+- Redo using @wordpress/scripts
+
+
+
+
 #### [Version 1.1.0](https://github.com/Codeinwp/blocks-export-import/compare/v1.0.2...v1.1.0) (2020-06-07)
 
 - Changed export file format.
